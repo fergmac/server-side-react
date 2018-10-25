@@ -7028,13 +7028,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // ese2015 modules 
 var app = (0, _express2.default)();
 
+// Express needs to treat this directory as static directory available to outside world
+app.use(_express2.default.static('public'));
+
 app.get('/', function (req, res) {
 	// Allows us to write jsx on server side
 	// on client side we import jsx into on file 
 	// then we webpack, which babel turns into regular js code
-	var content = (0, _server.renderToString)(_react2.default.createElement(_Home2.default, null));
+	var content = (0, _server.renderToString)(_react2.default.createElement(_Home2.default, null)); // boot up location on server side like client component render
 
-	res.send(content);
+	// Load JS bundle from server
+	var html = '\n\t\t<html>\n\t\t\t<head></head>\n\t\t\t<body>\n\t\t\t\t<div id="root">' + content + '</div>\n\t\t\t\t<script src="bundle.js"></script>\n\t\t\t</body>\n\t\t</html>\n\t';
+
+	res.send(html);
 });
 
 app.listen(3000, function () {

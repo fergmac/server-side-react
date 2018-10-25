@@ -11,15 +11,30 @@ import express from 'express';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import Home from './client/components/Home';
+
 const app = express();
+
+// Express needs to treat this directory as static directory available to outside world
+app.use(express.static('public'));
 
 app.get('/', (req, res) => {
 	// Allows us to write jsx on server side
 	// on client side we import jsx into on file 
 	// then we webpack, which babel turns into regular js code
-	const content = renderToString(<Home />);
+	const content = renderToString(<Home />); // boot up location on server side like client component render
 
-	res.send(content);	
+	// Load JS bundle from server
+	const html = `
+		<html>
+			<head></head>
+			<body>
+				<div id="root">${content}</div>
+				<script src="bundle.js"></script>
+			</body>
+		</html>
+	`;	
+
+	res.send(html);	
 });
 
 app.listen(3000, () => {
