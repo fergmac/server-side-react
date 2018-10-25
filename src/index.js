@@ -12,8 +12,8 @@ const app = express();
 // Express needs to treat this directory as static directory available to outside world
 app.use(express.static('public'));
 
-app.get('/', (req, res) => {
-	res.send(renderer());	
+app.get('*', (req, res) => {
+	res.send(renderer(req));	
 });
 
 app.listen(3000, () => {
