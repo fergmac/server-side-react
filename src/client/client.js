@@ -1,4 +1,5 @@
 // Entry Point for client side code base
+import 'babel-polyfill'; // Make use of async await syntax
 import React from 'react';
 import ReactDom from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';

@@ -4,6 +4,7 @@
 // const express = require('express');
 
 // ese2015 modules 
+import 'babel-polyfill'; // Make use of async await syntax
 import express from 'express';
 import renderer from './helpers/renderer';
 import createStore from './helpers/createStore';
