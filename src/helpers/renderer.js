@@ -7,16 +7,19 @@
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
 import Routes from '../client/Routes';
 
-export default (req) => {
+export default (req, store) => {
 	// Allows us to write jsx on server side
 	// on client side we import jsx into on file 
 	// then we webpack, which babel turns into regular js code
 	const content = renderToString(
+		<Provider store={store}>
 			<StaticRouter location={req.path} context={{}}>
 				<Routes />
 			</StaticRouter>
+		</Provider>
 		); // boot up location on server side like client component render
 
 	// Load JS bundle from server

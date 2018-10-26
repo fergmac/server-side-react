@@ -90,21 +90,28 @@ var _renderer = __webpack_require__(4);
 
 var _renderer2 = _interopRequireDefault(_renderer);
 
+var _createStore = __webpack_require__(8);
+
+var _createStore2 = _interopRequireDefault(_createStore);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var app = (0, _express2.default)();
+
+// Express needs to treat this directory as static directory available to outside world
 // Entry Point for server side JS
 
 // common JS or require JS syntax
 // const express = require('express');
 
 // ese2015 modules 
-var app = (0, _express2.default)();
-
-// Express needs to treat this directory as static directory available to outside world
 app.use(_express2.default.static('public'));
 
 app.get('*', function (req, res) {
-	res.send((0, _renderer2.default)(req));
+	var store = (0, _createStore2.default)();
+
+	// Some logic to initialize and load data into store
+	res.send((0, _renderer2.default)(req, store));
 });
 
 app.listen(3000, function () {
@@ -136,31 +143,36 @@ var _server = __webpack_require__(5);
 
 var _reactRouterDom = __webpack_require__(1);
 
+var _reactRedux = __webpack_require__(11);
+
 var _Routes = __webpack_require__(6);
 
 var _Routes2 = _interopRequireDefault(_Routes);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// common JS or require JS syntax
+exports.default = function (req, store) {
+	// Allows us to write jsx on server side
+	// on client side we import jsx into on file 
+	// then we webpack, which babel turns into regular js code
+	var content = (0, _server.renderToString)(_react2.default.createElement(
+		_reactRedux.Provider,
+		{ store: store },
+		_react2.default.createElement(
+			_reactRouterDom.StaticRouter,
+			{ location: req.path, context: {} },
+			_react2.default.createElement(_Routes2.default, null)
+		)
+	)); // boot up location on server side like client component render
+
+	// Load JS bundle from server
+	return '\n\t\t<html>\n\t\t\t<head></head>\n\t\t\t<body>\n\t\t\t\t<div id="root">' + content + '</div>\n\t\t\t\t<script src="bundle.js"></script>\n\t\t\t</body>\n\t\t</html>\n\t';
+}; // common JS or require JS syntax
 // const React = require('React');
 // const renderToString = require('react-dom/server').renderToString;
 // const Home = require('./client/components/Home').default; // have to use when using commonJS and export default
 
 // es2015 modules
-exports.default = function (req) {
-	// Allows us to write jsx on server side
-	// on client side we import jsx into on file 
-	// then we webpack, which babel turns into regular js code
-	var content = (0, _server.renderToString)(_react2.default.createElement(
-		_reactRouterDom.StaticRouter,
-		{ location: req.path, context: {} },
-		_react2.default.createElement(_Routes2.default, null)
-	)); // boot up location on server side like client component render
-
-	// Load JS bundle from server
-	return '\n\t\t<html>\n\t\t\t<head></head>\n\t\t\t<body>\n\t\t\t\t<div id="root">' + content + '</div>\n\t\t\t\t<script src="bundle.js"></script>\n\t\t\t</body>\n\t\t</html>\n\t';
-};
 
 /***/ }),
 /* 5 */
@@ -235,6 +247,45 @@ var Home = function Home() {
 	);
 }; // es2015 modules
 exports.default = Home;
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _redux = __webpack_require__(9);
+
+var _reduxThunk = __webpack_require__(10);
+
+exports.default = function () {
+	var store = (0, _redux.createStore)(reducers, {}, (0, _redux.applyMiddleware)(_reduxThunk.thunk));
+
+	return store;
+};
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+module.exports = require("redux");
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+module.exports = require("redux-thunk");
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+module.exports = require("react-redux");
 
 /***/ })
 /******/ ]);
