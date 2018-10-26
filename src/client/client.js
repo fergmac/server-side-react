@@ -7,6 +7,7 @@ import thunk from 'redux-thunk'; // Handle async action creators
 import { Provider } from 'react-redux'; // Ties store and react side of our app together
 
 import Routes from './Routes';
+import reducers from './reducers';
 
 const store = createStore(reducers, {}, applyMiddleware(thunk));
 
