@@ -18,7 +18,7 @@ const app = express();
 app.use('/api', proxy('http://react-ssr-api.heokuapp.com', {
 	// For O-Auth process with google flow
 	proxyReqOptDecorator(opts) {
-			opts.header['x-forwarded-host'] = 'localhost:3000';
+			opts.headers['x-forwarded-host'] = 'localhost:3000';
 			return opts;
 	}
 }));
@@ -27,7 +27,7 @@ app.use('/api', proxy('http://react-ssr-api.heokuapp.com', {
 app.use(express.static('public'));
 
 app.get('*', (req, res) => {
-	const store = createStore();
+	const store = createStore(req);
 
 	// Looks at list of routes and the route the user is trying to access
 	const promises = matchRoutes(Routes, req.path).map(({route}) => {
