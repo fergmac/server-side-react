@@ -1,4 +1,4 @@
-import React from 'react';
+import App from './App';
 import HomePage from './pages/HomePage';
 import UsersListPage, { loadData } from './pages/UsersListPage';
 
@@ -15,12 +15,17 @@ import UsersListPage, { loadData } from './pages/UsersListPage';
 // Refactor solution for server side, routes as array of objects
 export default [
 	{
-		...HomePage,
-		path: '/',
-		exact: true
-	},
-	{
-		...UsersListPage,
-		path: '/Users',
+		...App,
+		routes: [
+			{
+				...HomePage,
+				path: '/',
+				exact: true
+			},
+			{
+				...UsersListPage,
+				path: '/Users',
+			}
+		]
 	}
 ];
