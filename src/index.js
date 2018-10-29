@@ -7,11 +7,21 @@
 import 'babel-polyfill'; // Make use of async await syntax
 import express from 'express';
 import { matchRoutes } from 'react-router-config';
+import proxy from 'express-http-proxy';
 import Routes from './client/Routes';
 import renderer from './helpers/renderer';
 import createStore from './helpers/createStore';
 
 const app = express();
+
+// Proxy - any request of /api will be sent to this domain
+app.use('/api', proxy('http://react-ssr-api.heokuapp.com', {
+	// For O-Auth process with google flow
+	proxyReqOptDecorator(opts) {
+			opts.header['x-forwarded-host'] = 'localhost:3000';
+			return opts;
+	}
+}));
 
 // Express needs to treat this directory as static directory available to outside world
 app.use(express.static('public'));

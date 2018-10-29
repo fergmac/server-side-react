@@ -7,14 +7,20 @@ import { createStore, applyMiddleware } from 'redux'; // Create store and hookup
 import thunk from 'redux-thunk'; // Handle async action creators
 import { Provider } from 'react-redux'; // Ties store and react side of our app together
 import { renderRoutes } from 'react-router-config';
+import axios from 'axios';
 
 import Routes from './Routes';
 import reducers from './reducers';
 
+// Set up client axios instance
+const axiosInstance = axios.create({
+	baseURL: '/api'
+});
+
 const store = createStore(
 	reducers, 
 	window.INITIAL_STATE, 
-	applyMiddleware(thunk)
+	applyMiddleware(thunk.withExtraArgument(axiosInstance)) //Add .withExtraArgument(axiosInstance) for axios instance
 );
 
 ReactDom.hydrate(
