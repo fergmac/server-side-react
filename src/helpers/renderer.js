@@ -11,6 +11,7 @@ import { Provider } from 'react-redux';
 import { renderRoutes } from 'react-router-config';
 import serialize from 'serialize-javascript';
 import Routes from '../client/Routes';
+import { Helmet } from 'react-helmet';
 
 export default (req, store, context) => {
 	// Allows us to write jsx on server side
@@ -24,10 +25,15 @@ export default (req, store, context) => {
 		</Provider>
 		); // boot up location on server side like client component render
 
+		// renderStatic returns object of all tags
+		const helmet = Helmet.renderStatic();
+
 	// Load JS bundle from server
 	return `
 		<html>
 			<head>
+				${helmet.title.toString()}
+				${helmet.meta.toString()}
 				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 			</head>
 			<body>
