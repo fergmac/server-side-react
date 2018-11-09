@@ -11,7 +11,8 @@ module.exports = {
 						'react', // take jsx and turn into normal js function calls
 						'stage-0',
 						['env', { targets: { browsers: ['last 2 versions'] }}] // master preset
-					]
+					],
+					"plugins": ["transform-class-properties"]
 				}
 			}
 		]

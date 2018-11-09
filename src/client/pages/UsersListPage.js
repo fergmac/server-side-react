@@ -29,7 +29,7 @@ function mapStateToProps(state) {
 
 function loadData(store) {
 	// Returns promise representing network request
-	// return store.dispatch(fetchUsers());
+	return store.dispatch(fetchUsers());
 }
 
 export default {
