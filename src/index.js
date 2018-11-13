@@ -1,9 +1,4 @@
 // Entry Point for server side JS
-
-// common JS or require JS syntax
-// const express = require('express');
-
-// ese2015 modules 
 import 'babel-polyfill'; // Make use of async await syntax
 import express from 'express';
 import { matchRoutes } from 'react-router-config';
