@@ -7,7 +7,18 @@ import Routes from './client/Routes';
 import renderer from './helpers/renderer';
 import createStore from './helpers/createStore';
 
+import cookieParser from 'cookie-parser';
+import getUser from './middleware/get-user.js';
+
+const router = express.Router();
 const app = express();
+const port = process.env.PORT || 3000;
+
+// require('./routes')(router);
+// app.use(router);
+
+app.use(cookieParser());
+app.use(getUser());
 
 // Proxy - any request of /api will be sent to this domain
 app.use('/api', proxy('http://react-ssr-api.heokuapp.com', {
@@ -56,6 +67,14 @@ app.get('*', (req, res) => {
 	});
 });
 
-app.listen(3000, () => {
-	console.log('Lisenting on port 3000');
+// app.listen(3000, () => {
+// 	console.log('Lisenting on port 3000');
+// });
+
+app.listen(port, (err) => {
+	if (err) {
+		console.log('There was an error starting express: ', err);
+	} else {
+		console.log(`Express was started! Listening on port: ${port}`);
+	}
 });
