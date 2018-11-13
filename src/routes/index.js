@@ -4,7 +4,9 @@ const optimizely = new OptimizelyService();
 module.exports = (router) => {
 	router.get('/', (req, res) => {
 		
-		optimizely.client.getVariation();
+		const variation = req.optimizely.client.activate('express-playground', req.userId);
+
+		res.send(variation);
 	});
 
 	router.get('/update_data_file', () => {

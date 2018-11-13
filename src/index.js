@@ -10,15 +10,19 @@ import createStore from './helpers/createStore';
 import cookieParser from 'cookie-parser';
 import getUser from './middleware/get-user.js';
 
+const OptimizelyService = require('./services/optimizely');
 const router = express.Router();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// require('./routes')(router);
-// app.use(router);
-
+// Middleware
 app.use(cookieParser());
 app.use(getUser());
+app.use(OptimizelyService.initialize());
+
+// Routes
+// require('./routes')(router);
+// app.use(router);
 
 // Proxy - any request of /api will be sent to this domain
 app.use('/api', proxy('http://react-ssr-api.heokuapp.com', {

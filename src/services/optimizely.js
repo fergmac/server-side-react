@@ -4,25 +4,35 @@ const optimizely = require('@optimizely/optimizely-sdk');
 class OptimizelyService {
 	constructor() {
 		this.client = {};
-		this.getDataFile();
-		this.updateDataFile();
-		this.getVariation();
+		this.datafile = null;
+		
+		this.getDataFile()
+			.then(() => this.getClient());
+	}
+
+	getClient() {
+		this.client = optimizely.createInstance({ datafile: this.datafile, skipJSONValidation: true });
 	}
 
 	updateDataFile() {
 		this.getDataFile();
 	}
 
-	getDataFile() {
-		axios.get('https://cdn.optimizely.com/datafiles/MspCQ3UTqvTiQXj4gYYQiN.json').then(({ data }) => {
-			this.client = optimizely.createInstance({ dataFile: data, skipJSONValidation: true });
-		});
+	async getDataFile() {
+		const res = await axios.get('https://cdn.optimizely.com/datafiles/MspCQ3UTqvTiQXj4gYYQiN.json');
+		this.datafile = res.data;
+
+		return Promise.resolve();
 	}
 
-	getVariation() {
-		return (req, res) => {
-			const variation = this.client.activate('express-playground', req.userId);
-			res.send(variation);
+	static initialize() {
+		const optimizely = new OptimizelyService();
+
+		return (req, res, next) => {
+			req.optimizely = optimizely;
+
+			// TODO: return an optimizely object && set user ID
+			next();
 		}
 	}
 }
