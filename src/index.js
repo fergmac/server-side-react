@@ -8,7 +8,6 @@ import renderer from './helpers/renderer';
 import createStore from './helpers/createStore';
 
 import cookieParser from 'cookie-parser';
-import getUser from './middleware/get-user.js';
 
 const OptimizelyService = require('./services/optimizely');
 const router = express.Router();
@@ -17,7 +16,6 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cookieParser());
-app.use(getUser());
 app.use(OptimizelyService.initialize());
 
 // Routes

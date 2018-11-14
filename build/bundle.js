@@ -320,14 +320,10 @@ var _cookieParser = __webpack_require__(29);
 
 var _cookieParser2 = _interopRequireDefault(_cookieParser);
 
-var _getUser = __webpack_require__(30);
-
-var _getUser2 = _interopRequireDefault(_getUser);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Make use of async await syntax
-var OptimizelyService = __webpack_require__(32); // Entry Point for server side JS
+// Entry Point for server side JS
+var OptimizelyService = __webpack_require__(31); // Make use of async await syntax
 
 var router = _express2.default.Router();
 var app = (0, _express2.default)();
@@ -335,7 +331,6 @@ var port = process.env.PORT || 3000;
 
 // Middleware
 app.use((0, _cookieParser2.default)());
-app.use((0, _getUser2.default)());
 app.use(OptimizelyService.initialize());
 
 // Routes
@@ -1132,45 +1127,14 @@ exports.default = function () {
 module.exports = require("cookie-parser");
 
 /***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var uuidv4 = __webpack_require__(31);
-
-// Create ID
-var createUserId = function createUserId() {
-	return uuidv4();
-};
-
-module.exports = function () {
-	return function (req, res, next) {
-		if (req.cookies['optimizely_user']) {
-			req.userId = req.cookies['optimizely_user'];
-			console.log('userId ' + req.userId);
-		} else {
-			req.userId = createUserId();
-			console.log('createUserId ' + req.userId);
-			res.cookie('optimizely_user', req.userId, { expire: new Date() + 1800000 });
-		}
-		next();
-	};
-};
-
-/***/ }),
+/* 30 */,
 /* 31 */
-/***/ (function(module, exports) {
-
-module.exports = require("uuid/v4");
-
-/***/ }),
-/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1179,7 +1143,8 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var axios = __webpack_require__(8);
-var optimizely = __webpack_require__(33);
+var optimizely = __webpack_require__(32);
+var uuidv4 = __webpack_require__(33);
 
 var OptimizelyService = function () {
 	function OptimizelyService() {
@@ -1189,7 +1154,7 @@ var OptimizelyService = function () {
 
 		this.client = {};
 		this.datafile = null;
-
+		this.optimizelyUser = null;
 		this.getDataFile().then(function () {
 			return _this.getClient();
 		});
@@ -1200,10 +1165,17 @@ var OptimizelyService = function () {
 		value: function getClient() {
 			this.client = optimizely.createInstance({ datafile: this.datafile, skipJSONValidation: true });
 		}
+
+		// TODO: Add webhook for visits to update url
+
 	}, {
 		key: 'updateDataFile',
 		value: function updateDataFile() {
-			this.getDataFile();
+			var _this2 = this;
+
+			this.getDataFile().then(function () {
+				return _this2.getClient();
+			});
 		}
 	}, {
 		key: 'getDataFile',
@@ -1238,15 +1210,46 @@ var OptimizelyService = function () {
 
 			return getDataFile;
 		}()
+	}, {
+		key: 'track',
+		value: function track(goalKey) {
+			var extraAttributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+			return this.client.track(goalKey, this.optimizelyUser, this.getAttributes(extraAttributes));
+		}
+	}, {
+		key: 'activate',
+		value: function activate(experimentKey) {
+			var extraAttributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+			return this.client.activate(experimentKey, this.optimizelyUser, this.getAttributes(extraAttributes));
+		}
+	}, {
+		key: 'getAttributes',
+		value: function getAttributes(extraAttributes) {
+			// TODO: bring in NPM for checking device
+			return _extends({
+				DEVICE: 'DESKTOP'
+			}, extraAttributes);
+		}
 	}], [{
+		key: 'setOptimizelyUser',
+		value: function setOptimizelyUser(req) {
+			return req.cookies['optimizely_user'] = req.cookies['optimizely_user'] ? req.cookies['optimizely_user'] : uuidv4();
+		}
+	}, {
 		key: 'initialize',
 		value: function initialize() {
-			var optimizely = new OptimizelyService();
+			var _this3 = this;
+
+			var optimizelyClient = new OptimizelyService();
 
 			return function (req, res, next) {
-				req.optimizely = optimizely;
 
-				// TODO: return an optimizely object && set user ID
+				optimizelyClient.optimizelyUser = _this3.setOptimizelyUser(req);
+
+				req.optimizely = optimizelyClient;
+
 				next();
 			};
 		}
@@ -1258,10 +1261,16 @@ var OptimizelyService = function () {
 module.exports = OptimizelyService;
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports) {
 
 module.exports = require("@optimizely/optimizely-sdk");
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports) {
+
+module.exports = require("uuid/v4");
 
 /***/ })
 /******/ ]);
